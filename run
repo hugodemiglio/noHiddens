@@ -1,0 +1,75 @@
+<?php
+
+$diretorio = "/Volumes/CARRO";
+
+class Hidden{
+  
+  var $fila = array();
+  var $atual;
+  var $inicio = '.'; //Inicio do arquivo a ser apagado
+  
+  function __construct($diretorio){
+    $this->fila[] = $diretorio;
+    while(isset($this->fila[0])){
+      $this->atual = $this->fila[0];
+      $this->remover($this->retornarDir($this->atual));
+      $this->reAlocar();
+    }
+  }
+  
+  function retornarDir($diretorio){
+    if(is_dir($diretorio)){
+      $dh = opendir($diretorio);
+      $files = array();
+      $dirs = array();
+      while (($file = readdir($dh)) !== false){
+        if($file == '.' OR $file == '..') continue;
+        if(is_dir($diretorio.'/'.$file)){
+          array_push($dirs, $diretorio.'/'.$file);
+        } else {
+          array_push($files, $file);
+        }
+      }
+      closedir($dh);
+    }
+    $this->insert($dirs);
+    return $files;
+  }
+
+  function remover($files, $inicio = '.'){
+    if(is_array($files)) foreach($files as $file){
+      if(substr($file, 0, strlen($inicio)) == $inicio){
+        system("rm ".$this->nomeBarra($this->atual)."/".$this->nomeBarra($file));
+      }
+    }
+  }
+
+  function nomeBarra($nome){
+    return str_replace(' ', '\ ', $nome);
+  }
+  
+  function reAlocar(){
+    $fila = $this->fila;
+    $return = array();
+    if(is_array($fila)) foreach($fila as $key => $valor){
+      if($key == 0) continue;
+      $return[] = $valor;
+    }
+    $this->fila = $return;
+  }
+  
+  function insert($array){
+    $inicio = count($this->fila);
+    $return = $this->fila;
+    if(is_array($array)) foreach($array as $dados){
+      $return[$inicio] = $dados;
+      $inicio++;
+    }
+    $this->fila = $return;
+  }
+
+}
+
+$hidden = new Hidden($diretorio);
+
+?>
