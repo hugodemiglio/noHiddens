@@ -20,12 +20,16 @@ class Hidden{
   var $inicio = '.'; //Inicio do arquivo a ser apagado (p/ apagar tudo, deixe em branco)
   
   function __construct($diretorio){
+    $this->write("Iniciando busca no diretório.;;");
     $this->fila[] = $diretorio;
     while(isset($this->fila[0])){
       $this->atual = $this->fila[0];
+      $this->write("Diretório atual: '".$this->atual."'...;");
       $this->remover($this->retornarDir($this->atual));
+      $this->write("Terminando ações no diretório...<ok>  [ OK ]</c>;;");
       $this->reAlocar();
     }
+    $this->write(";Concluido com sucesso.;;");
   }
   
   function retornarDir($diretorio){
@@ -44,12 +48,14 @@ class Hidden{
       closedir($dh);
     }
     $this->insert($dirs);
+    $this->write("Resumo: ".count($dirs)." diretório(s) e ".count($files)." arquivo(s).;");
     return $files;
   }
 
   function remover($files){
     if(is_array($files)) foreach($files as $file){
       if(substr($file, 0, strlen($this->inicio)) == $this->inicio){
+        $this->write("<fail>Removendo arquivo: '".$file."'<ok>  [ OK ]</c>;");
         system("rm ".$this->nomeBarra($this->atual)."/".$this->nomeBarra($file));
       }
     }
@@ -73,10 +79,20 @@ class Hidden{
     $inicio = count($this->fila);
     $return = $this->fila;
     if(is_array($array)) foreach($array as $dados){
+      $this->write("<info>Adicionando '".$dados."' na fila.</c>;");
       $return[$inicio] = $dados;
       $inicio++;
     }
     $this->fila = $return;
+  }
+  
+  function write($text){
+    $text = str_replace(';', "\n", $text);
+    $text = str_replace('</c>', "\033[0m", $text); //Normal Color
+    $text = str_replace('<ok>', "\033[92m", $text); //OK Color
+    $text = str_replace('<info>', "\033[94m", $text); //INFO Color
+    $text = str_replace('<fail>', "\033[91m", $text); //FAIL Color
+    echo $text;
   }
 
 }
