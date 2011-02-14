@@ -1,12 +1,23 @@
 <?php
 
-$diretorio = "/Volumes/CARRO";
+/* *
+* 
+* Classe hidden
+* 
+* Desenvolvida por Hugo Demiglio (@hugodemiglio)
+* hugo@formaweb.com.br
+* 
+* Recomendado para o Mac OS (comando "php run")
+*
+* */
+
+$diretorio = "/Volumes/CARRO"; // Diretório a ser vasculhado
 
 class Hidden{
   
   var $fila = array();
   var $atual;
-  var $inicio = '.'; //Inicio do arquivo a ser apagado
+  var $inicio = '.'; //Inicio do arquivo a ser apagado (p/ apagar tudo, deixe em branco)
   
   function __construct($diretorio){
     $this->fila[] = $diretorio;
@@ -36,9 +47,9 @@ class Hidden{
     return $files;
   }
 
-  function remover($files, $inicio = '.'){
+  function remover($files){
     if(is_array($files)) foreach($files as $file){
-      if(substr($file, 0, strlen($inicio)) == $inicio){
+      if(substr($file, 0, strlen($this->inicio)) == $this->inicio){
         system("rm ".$this->nomeBarra($this->atual)."/".$this->nomeBarra($file));
       }
     }
