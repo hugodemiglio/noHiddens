@@ -29,6 +29,7 @@ class Hidden{
       $this->write("Terminando ações no diretório...<ok>  [ OK ]</c>;;");
       $this->reAlocar();
     }
+    $this->removeMacPath();
     $this->write(";Concluido com sucesso.;;");
   }
   
@@ -50,6 +51,12 @@ class Hidden{
     $this->insert($dirs);
     $this->write("Resumo: ".count($dirs)." diretório(s) e ".count($files)." arquivo(s).;");
     return $files;
+  }
+  
+  function removeMacPath(){
+    system("rm -R /Volumes/CARRO/.Spotlight-V100/");
+    system("rm -R /Volumes/CARRO/.Trashes/");
+    system("rm -R /Volumes/CARRO/.fseventsd/");
   }
 
   function remover($files){
