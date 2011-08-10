@@ -17,11 +17,13 @@ class Hidden{
   
   var $fila = array();
   var $atual;
+  var $root;
   var $inicio = '.'; //Inicio do arquivo a ser apagado (p/ apagar tudo, deixe em branco)
   
   function __construct($diretorio){
     $this->write("Iniciando busca no diretório.;;");
     $this->fila[] = $diretorio;
+    $this->root = $diretorio;
     while(isset($this->fila[0])){
       $this->atual = $this->fila[0];
       $this->write("Diretório atual: '".$this->atual."'...;");
@@ -54,9 +56,13 @@ class Hidden{
   }
   
   function removeMacPath(){
-    system("rm -R /Volumes/CARRO/.Spotlight-V100/");
-    system("rm -R /Volumes/CARRO/.Trashes/");
-    system("rm -R /Volumes/CARRO/.fseventsd/");
+    $paths = array('.Spotlight-V100', '.Trashes', '.fseventsd');
+    foreach($paths as $path){
+      if(is_dir($this->root."/".$path."/")){
+        system("rm -R ".$this->root."/".$path."/");
+        $this->write("<fail>Removendo pasta: '".$path."'<ok>  [ OK ]</c>;");
+      }
+    }
   }
 
   function remover($files){
@@ -69,7 +75,7 @@ class Hidden{
   }
 
   function nomeBarra($nome){
-    return str_replace(' ', '\ ', $nome);
+    return str_replace(' ', '\ ', str_replace("'", "\'", str_replace('"', '\"', $nome)));
   }
   
   function reAlocar(){
@@ -103,6 +109,8 @@ class Hidden{
   }
 
 }
+
+if(isset($_SERVER['argv'][1])) $diretorio = $_SERVER['argv'][1];
 
 $hidden = new Hidden($diretorio);
 
