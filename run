@@ -75,7 +75,18 @@ class Hidden{
   }
 
   function nomeBarra($nome){
-    return str_replace(' ', '\ ', str_replace("'", "\'", str_replace('"', '\"', $nome)));
+    $replaces = array(
+      ' ' => '\ ',
+      "'" => "\'",
+      '"' => '\"',
+      '(' => '\(',
+      ')' => '\)',
+    );
+    foreach($replaces as $key => $replace){
+      $nome = str_replace($key, $replace, $nome);
+    }
+    return $nome;
+    //return str_replace(' ', '\ ', str_replace("'", "\'", str_replace('"', '\"', $nome)));
   }
   
   function reAlocar(){
