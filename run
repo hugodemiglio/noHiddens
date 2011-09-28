@@ -11,6 +11,8 @@
 *
 * */
 
+date_default_timezone_set('America/Sao_Paulo');
+
 $diretorio = "/Volumes/CARRO"; // Diretório a ser vasculhado
 
 class Hidden{
@@ -19,9 +21,13 @@ class Hidden{
   var $atual;
   var $root;
   var $inicio = '.'; //Inicio do arquivo a ser apagado (p/ apagar tudo, deixe em branco)
+  var $startTime = 0;
+  var $totalSize = 0;
+  var $apagados = 0;
   
   function __construct($diretorio){
-    $this->write("Iniciando busca no diretório.;;");
+    $this->startTime = date("U");
+    $this->welcome();
     $this->fila[] = $diretorio;
     $this->root = $diretorio;
     while(isset($this->fila[0])){
@@ -32,7 +38,8 @@ class Hidden{
       $this->reAlocar();
     }
     $this->removeMacPath();
-    $this->write(";Concluido com sucesso.;;");
+    $tempo = date("U") - $this->startTime;
+    $this->relatorio();
   }
   
   function retornarDir($diretorio){
@@ -45,6 +52,7 @@ class Hidden{
         if(is_dir($diretorio.'/'.$file)){
           array_push($dirs, $diretorio.'/'.$file);
         } else {
+          $this->totalSize = $this->totalSize + filesize($diretorio.'/'.$file);
           array_push($files, $file);
         }
       }
@@ -70,6 +78,7 @@ class Hidden{
       if(substr($file, 0, strlen($this->inicio)) == $this->inicio){
         $this->write("<fail>Removendo arquivo: '".$file."'<ok>  [ OK ]</c>;");
         system("rm ".$this->nomeBarra($this->atual)."/".$this->nomeBarra($file));
+        $this->apagados++;
       }
     }
   }
@@ -86,7 +95,6 @@ class Hidden{
       $nome = str_replace($key, $replace, $nome);
     }
     return $nome;
-    //return str_replace(' ', '\ ', str_replace("'", "\'", str_replace('"', '\"', $nome)));
   }
   
   function reAlocar(){
@@ -110,6 +118,47 @@ class Hidden{
     $this->fila = $return;
   }
   
+  function welcome(){
+    system("clear");
+    $this->write("╔═══════════════════╗;");
+    $this->write("║  Limpar    1.0.5  ║;");
+    $this->write("╚═══════════════════╝;");
+    $this->write(";Iniciando busca no diretório.;;");
+  }
+  
+  function relatorio(){
+    $lines = array(
+      "Tamanho utilizado: ".$this->decodeSize($this->totalSize). " (total: ".$this->decodeSize(@disk_free_space($this->root) + $this->totalSize).")",
+      "Tempo do processo: ".$tempo." segundo(s)",
+      "Arquivos apagados: ".$this->apagados,
+    );
+    
+    $size = 0;
+    foreach($lines as $line){
+      if(strlen($line) > $size) $size = strlen($line);
+    }
+    
+    $this->write("╔═════════════╗;");
+    $this->write("║  Relatório  ║;");
+    $this->write("╠═════════════╩".$this->_repeat($size - 12, '═')."╗;");
+    
+    foreach($lines as $line){
+      $space = $size - strlen($line);
+      $this->write("║ ".$line." ".$this->_repeat($space)."║;");
+    }
+    
+    $this->write("╚".$this->_repeat($size + 2, '═')."╝;");
+    
+    $this->write(";Concluido com sucesso.<ok> [ OK ]</c>;;");
+  }
+  
+  function _repeat($count, $char = ' '){
+    for($i = 0; $i <= $count; $i++){
+      $space_line .= $char;
+    }
+    return $space_line;
+  }
+  
   function write($text){
     $text = str_replace(';', "\n", $text);
     $text = str_replace('</c>', "\033[0m", $text); //Normal Color
@@ -117,6 +166,12 @@ class Hidden{
     $text = str_replace('<info>', "\033[94m", $text); //INFO Color
     $text = str_replace('<fail>', "\033[91m", $text); //FAIL Color
     echo $text;
+  }
+  
+  function decodeSize($bytes = 0){
+    $types = array( 'B', 'KB', 'MB', 'GB', 'TB' );
+    for( $i = 0; $bytes >= 1024 && $i < ( count( $types ) -1 ); $bytes /= 1024, $i++ );
+    return round($bytes, 2) . " " . $types[$i];
   }
 
 }
