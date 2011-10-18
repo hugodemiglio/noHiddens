@@ -38,7 +38,6 @@ class Hidden{
       $this->reAlocar();
     }
     $this->removeMacPath();
-    $tempo = date("U") - $this->startTime;
     $this->relatorio();
   }
   
@@ -90,6 +89,7 @@ class Hidden{
       '"' => '\"',
       '(' => '\(',
       ')' => '\)',
+      '&' => '\&',
     );
     foreach($replaces as $key => $replace){
       $nome = str_replace($key, $replace, $nome);
@@ -127,6 +127,7 @@ class Hidden{
   }
   
   function relatorio(){
+    $tempo = date("U") - $this->startTime;
     $lines = array(
       "Tamanho utilizado: ".$this->decodeSize($this->totalSize). " (total: ".$this->decodeSize(@disk_free_space($this->root) + $this->totalSize).")",
       "Tempo do processo: ".$tempo." segundo(s)",
